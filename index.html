@@ -7,7 +7,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{overflow:hidden;background:#000;font-family:'Segoe UI',sans-serif;user-select:none}
-canvas{display:block}
+canvas{display:block;position:relative;z-index:0}
 
 #ui-overlay{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10}
 
@@ -23,7 +23,7 @@ canvas{display:block}
 
 #cycle-indicator{position:absolute;top:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:6px 24px;color:#fff;font-size:12px;letter-spacing:3px;text-transform:uppercase;backdrop-filter:blur(6px);transition:all 1s}
 
-#start-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(180deg,#0a1a0a 0%,#0a0a1a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;color:#fff}
+#start-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(180deg,#0a1a0a 0%,#0a0a1a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;color:#fff;pointer-events:auto}
 #start-screen h1{font-size:56px;font-weight:200;letter-spacing:12px;text-transform:uppercase;margin-bottom:4px;background:linear-gradient(90deg,#6f6,#8af);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 #start-screen .subtitle{font-size:18px;color:#686;letter-spacing:8px;margin-bottom:50px;font-weight:300}
 #start-screen .controls{font-size:13px;color:#555;line-height:2.2;text-align:center;margin-bottom:40px}
@@ -63,28 +63,28 @@ canvas{display:block}
   <div class="story-page active" data-page="1">
     <div class="page-num">I</div>
     <p>You are a mortal, lost in the Spring Court of Prythian. The ancient forest stretches endlessly &mdash; beautiful and deadly.</p>
-    <button class="story-next" onclick="advanceStory()">Continue</button>
+    <button class="story-next">Continue</button>
     <div class="story-hint">Press Space or Enter</div>
   </div>
 
   <div class="story-page" data-page="2">
     <div class="page-num">II</div>
     <p>The Wild Hunt has found your scent. A shadow beast, born of old magic, pursues all who trespass. You must run.</p>
-    <button class="story-next" onclick="advanceStory()">Continue</button>
+    <button class="story-next">Continue</button>
     <div class="story-hint">Press Space or Enter</div>
   </div>
 
   <div class="story-page" data-page="3">
     <div class="page-num">III</div>
     <p>Weave between the forest lanes with <span>A / D</span> or <span>Arrow Keys</span>. Leap over fallen logs and brambles, or onto ancient stones with <span>W / Space</span>.</p>
-    <button class="story-next" onclick="advanceStory()">Continue</button>
+    <button class="story-next">Continue</button>
     <div class="story-hint">Press Space or Enter</div>
   </div>
 
   <div class="story-page" data-page="4">
     <div class="page-num">IV</div>
     <p>Gather ash shavings to quicken your pace. Collect iron charms to ward off fae magic. Strike down lesser fae with your ash dagger &mdash; <span>F</span>.</p>
-    <button class="story-next" onclick="advanceStory()">Continue</button>
+    <button class="story-next">Continue</button>
     <div class="story-hint">Press Space or Enter</div>
   </div>
 
@@ -94,6 +94,33 @@ canvas{display:block}
     <button id="start-btn">Enter the Forest</button>
   </div>
 </div>
+
+<script>
+(function() {
+  var storyPage = 1;
+  var pages = document.querySelectorAll('.story-page');
+  var total = pages.length;
+  function advance() {
+    if (storyPage >= total) return;
+    pages[storyPage - 1].classList.remove('active');
+    storyPage++;
+    pages[storyPage - 1].classList.add('active');
+  }
+  document.getElementById('start-screen').addEventListener('click', function(e) {
+    if (e.target.classList.contains('story-next')) advance();
+  });
+  document.addEventListener('keydown', function(e) {
+    var screen = document.getElementById('start-screen');
+    if (screen.style.display === 'none') return;
+    if (document.getElementById('game-over').style.display === 'flex') return;
+    if (e.code === 'Space' || e.code === 'Enter') {
+      e.preventDefault();
+      if (storyPage < total) advance();
+      else document.getElementById('start-btn').click();
+    }
+  });
+})();
+</script>
 
 <div id="game-over">
   <h2>Caught by the Hunt</h2>
@@ -394,7 +421,7 @@ const dom = {
 // THREE.JS SETUP
 // ═══════════════════════════════════════════════════════════════════════════
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x0a1a0a, 0.015);
+scene.fog = new THREE.FogExp2(0x1a3a1a, 0.012);
 
 const camera = new THREE.PerspectiveCamera(72, innerWidth / innerHeight, 0.1, 250);
 camera.position.set(0, 4.5, 8);
@@ -404,33 +431,33 @@ renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(1);
 renderer.shadowMap.enabled = false;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.4;
+renderer.toneMappingExposure = 1.8;
 document.body.appendChild(renderer.domElement);
 
 // ── LIGHTING ────────────────────────────────────────────────────────────
-const ambientLight = new THREE.AmbientLight(0x3a6a3a, 0.7);
+const ambientLight = new THREE.AmbientLight(0x6aaa6a, 1.2);
 scene.add(ambientLight);
 
-const dirLight = new THREE.DirectionalLight(0xffeedd, 1.0);
+const dirLight = new THREE.DirectionalLight(0xffeedd, 1.6);
 dirLight.position.set(5, 15, 10);
 dirLight.castShadow = false;
 scene.add(dirLight);
 scene.add(dirLight.target);
 
 // Magical ambient (single scene PointLight)
-const magicLight = new THREE.PointLight(0x44ff88, 0.4, 25);
+const magicLight = new THREE.PointLight(0x44ff88, 0.8, 30);
 scene.add(magicLight);
 
 // ── GROUND ──────────────────────────────────────────────────────────────
 const groundGeo = new THREE.PlaneGeometry(200, 500);
-const groundMat = new THREE.MeshStandardMaterial({ color: 0x1a2a12, roughness: 0.95 });
+const groundMat = new THREE.MeshStandardMaterial({ color: 0x2a4a22, roughness: 0.95 });
 const ground = new THREE.Mesh(groundGeo, groundMat);
 ground.rotation.x = -Math.PI / 2; ground.position.z = -200;
 scene.add(ground);
 
 // Path
 const pathGeo = new THREE.PlaneGeometry(8, 500);
-const pathMat = new THREE.MeshStandardMaterial({ color: 0x2a1a0a, roughness: 0.85 });
+const pathMat = new THREE.MeshStandardMaterial({ color: 0x4a3a1a, roughness: 0.85 });
 const pathMesh = new THREE.Mesh(pathGeo, pathMat);
 pathMesh.rotation.x = -Math.PI / 2; pathMesh.position.y = 0.01; pathMesh.position.z = -200;
 scene.add(pathMesh);
@@ -695,17 +722,6 @@ function createObstacle(type) {
       g.add(thorn);
     }
     g.userData = { type: 'bramble', hitbox: { w: 1.5, h: 1.2 } };
-  } else {
-    const log = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.35, 3.5, 8),
-      new THREE.MeshStandardMaterial({ color: 0x3a2510, roughness: 0.95 }));
-    log.rotation.z = Math.PI / 2; log.position.y = 0.35; g.add(log);
-    for (let i = 0; i < 4; i++) {
-      const moss = new THREE.Mesh(new THREE.SphereGeometry(0.12 + Math.random() * 0.1, 5, 5),
-        new THREE.MeshStandardMaterial({ color: 0x2a6a2a, roughness: 0.9 }));
-      moss.position.set((Math.random() - 0.5) * 2.5, 0.5, (Math.random() - 0.5) * 0.3);
-      g.add(moss);
-    }
-    g.userData = { type: 'log', hitbox: { w: 2.5, h: 0.8 } };
   } else if (type === 'rock') {
     const rockMat = new THREE.MeshStandardMaterial({ color: 0x6a6a60, roughness: 0.85 });
     const rock = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.7, 0.5, 8), rockMat);
@@ -719,6 +735,17 @@ function createObstacle(type) {
       g.add(moss);
     }
     g.userData = { type: 'rock', hitbox: { w: 1.2, h: 0.5 }, jumpable: true };
+  } else {
+    const log = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.35, 3.5, 8),
+      new THREE.MeshStandardMaterial({ color: 0x3a2510, roughness: 0.95 }));
+    log.rotation.z = Math.PI / 2; log.position.y = 0.35; g.add(log);
+    for (let i = 0; i < 4; i++) {
+      const moss = new THREE.Mesh(new THREE.SphereGeometry(0.12 + Math.random() * 0.1, 5, 5),
+        new THREE.MeshStandardMaterial({ color: 0x2a6a2a, roughness: 0.9 }));
+      moss.position.set((Math.random() - 0.5) * 2.5, 0.5, (Math.random() - 0.5) * 0.3);
+      g.add(moss);
+    }
+    g.userData = { type: 'log', hitbox: { w: 2.5, h: 0.8 } };
   }
   return g;
 }
@@ -874,39 +901,41 @@ function doAttack() {
 // ── DAY / NIGHT CYCLE ───────────────────────────────────────────────────
 function updateCycle() {
   const dist = Math.abs(state.distance);
-  const cycleLen = 1000;
+  // 300m day, 50m transition, 300m night, 50m transition = 700m full cycle
+  const cycleLen = 700;
   const pos = (dist % cycleLen) / cycleLen;
+  const dayLen = 300 / cycleLen, transLen = 50 / cycleLen;
   let t;
-  if (pos < 0.4) t = 0;
-  else if (pos < 0.5) t = (pos - 0.4) / 0.1;
-  else if (pos < 0.9) t = 1;
-  else t = 1 - (pos - 0.9) / 0.1;
+  if (pos < dayLen) t = 0;
+  else if (pos < dayLen + transLen) t = (pos - dayLen) / transLen;
+  else if (pos < dayLen + transLen + dayLen) t = 1;
+  else t = 1 - (pos - dayLen - transLen - dayLen) / transLen;
   state.cyclePhase = t;
 
-  // Sky/fog — night is brighter and more magical (not dark)
-  const dayFog = new THREE.Color(0x0a1a0a);
-  const nightFog = new THREE.Color(0x0a0a1a);
+  // Sky/fog
+  const dayFog = new THREE.Color(0x2a4a2a);
+  const nightFog = new THREE.Color(0x1a1a3a);
   scene.fog.color.lerpColors(dayFog, nightFog, t);
-  scene.fog.density = 0.015 - t * 0.003; // less fog at night for better visibility
+  scene.fog.density = 0.012 - t * 0.003;
 
-  // Ambient — night is brighter, magical blue/purple
-  const dayAmb = new THREE.Color(0x3a6a3a);
-  const nightAmb = new THREE.Color(0x3a3a6a);
+  // Ambient
+  const dayAmb = new THREE.Color(0x6aaa6a);
+  const nightAmb = new THREE.Color(0x6060bb);
   ambientLight.color.lerpColors(dayAmb, nightAmb, t);
-  ambientLight.intensity = 0.7 + t * 0.3;
+  ambientLight.intensity = 1.2 + t * 0.3;
 
-  // Directional light — moonlight at night
-  dirLight.color.lerpColors(new THREE.Color(0xffeedd), new THREE.Color(0xaabbff), t);
-  dirLight.intensity = 1.0 - t * 0.2;
+  // Directional light
+  dirLight.color.lerpColors(new THREE.Color(0xffeedd), new THREE.Color(0xbbccff), t);
+  dirLight.intensity = 1.6 - t * 0.3;
 
-  renderer.toneMappingExposure = 1.4 - t * 0.2;
+  renderer.toneMappingExposure = 1.8 - t * 0.2;
 
   // Sun rays
   for (const ray of sunRays) ray.material.opacity = (1 - t) * 0.04;
 
   // Aurora
   for (let i = 0; i < auroraMaterials.length; i++) {
-    auroraMaterials[i].opacity = t * 0.12;
+    auroraMaterials[i].opacity = t * 0.2;
     const mesh = auroraGroup.children[i];
     const orig = mesh.userData.origPositions;
     const posAttr = mesh.geometry.attributes.position;
@@ -921,20 +950,20 @@ function updateCycle() {
   // Mushroom emissive glow (night)
   for (const m of mushrooms) {
     const cap = m.children[0];
-    if (cap && cap.material) cap.material.emissiveIntensity = 0.2 + t * 0.6;
+    if (cap && cap.material) cap.material.emissiveIntensity = 0.3 + t * 0.8;
   }
   // Wisps (brighter at night)
   for (const w of wisps) {
-    w.material.opacity = 0.2 + t * 0.6;
+    w.material.opacity = 0.3 + t * 0.7;
   }
 
   // Ground color shift
-  groundMat.color.lerpColors(new THREE.Color(0x1a2a12), new THREE.Color(0x10101a), t);
-  pathMat.color.lerpColors(new THREE.Color(0x2a1a0a), new THREE.Color(0x1a1020), t);
+  groundMat.color.lerpColors(new THREE.Color(0x2a4a22), new THREE.Color(0x1a1a30), t);
+  pathMat.color.lerpColors(new THREE.Color(0x4a3a1a), new THREE.Color(0x2a2040), t);
 
   // Dust particles color
-  dustMat.color.lerpColors(new THREE.Color(0xffeedd), new THREE.Color(0x8888ff), t);
-  dustMat.opacity = 0.2 + t * 0.15;
+  dustMat.color.lerpColors(new THREE.Color(0xffeedd), new THREE.Color(0xaaaaff), t);
+  dustMat.opacity = 0.2 + t * 0.25;
 
   if (t < 0.3) { dom.cycleIndicator.textContent = 'SPRING COURT'; dom.cycleIndicator.style.color = '#8f8'; dom.cycleIndicator.style.borderColor = 'rgba(100,255,100,0.2)'; }
   else if (t > 0.7) { dom.cycleIndicator.textContent = 'NIGHT COURT'; dom.cycleIndicator.style.color = '#aaf'; dom.cycleIndicator.style.borderColor = 'rgba(150,150,255,0.3)'; }
@@ -1196,31 +1225,6 @@ function startGame() {
   dom.invincible.style.opacity = '0';
   clock.getDelta();
 }
-
-// ── STORY PAGES ──────────────────────────────────────────────────────
-let storyPage = 1;
-const storyPages = document.querySelectorAll('.story-page');
-const totalStoryPages = storyPages.length;
-
-window.advanceStory = function() {
-  if (storyPage >= totalStoryPages) return;
-  storyPages[storyPage - 1].classList.remove('active');
-  storyPage++;
-  storyPages[storyPage - 1].classList.add('active');
-};
-
-document.addEventListener('keydown', e => {
-  if (dom.startScreen.style.display === 'none' || state.running) return;
-  if (dom.gameOver.style.display === 'flex') return;
-  if (e.code === 'Space' || e.code === 'Enter') {
-    e.preventDefault();
-    if (storyPage < totalStoryPages) {
-      advanceStory();
-    } else {
-      startGame();
-    }
-  }
-});
 
 document.getElementById('start-btn').addEventListener('click', startGame);
 document.getElementById('restart-btn').addEventListener('click', startGame);
