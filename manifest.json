@@ -1,0 +1,22 @@
+{
+  "name": "Spring Court Runner",
+  "short_name": "Spring Court",
+  "description": "Run through the courts of Prythian — dodge obstacles, collect power-ups, and outrun the Wild Hunt.",
+  "start_url": ".",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#0a1a0a",
+  "theme_color": "#0a1a0a",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

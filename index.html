@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a1a0a">
+<link rel="manifest" href="manifest.json">
 <title>Spring Court Runner</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -52,6 +56,53 @@ canvas{display:block;position:relative;z-index:0}
 
 #speed-boost{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.5);border:1px solid rgba(255,200,50,0.2);border-radius:20px;padding:4px 20px;color:#da4;font-size:11px;letter-spacing:2px;opacity:0;transition:opacity .3s;backdrop-filter:blur(4px)}
 #invincible{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.5);border:1px solid rgba(100,100,255,0.3);border-radius:20px;padding:4px 20px;color:#88f;font-size:11px;letter-spacing:2px;opacity:0;transition:opacity .3s;backdrop-filter:blur(4px)}
+
+/* ── TOUCH CONTROLS ─────────────────────────────────────────────────── */
+#touch-controls{position:fixed;bottom:0;left:0;right:0;z-index:8;pointer-events:none;padding-bottom:max(24px, env(safe-area-inset-bottom));display:none}
+#touch-controls.visible{display:block}
+#touch-controls button{pointer-events:all;position:absolute;border-radius:50%;border:2px solid rgba(150,255,150,0.25);background:rgba(20,40,20,0.35);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);color:rgba(180,255,180,0.7);width:68px;height:68px;display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:border-color .15s,background .15s,box-shadow .15s;outline:none;padding:0;cursor:pointer}
+#touch-controls button svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+#touch-controls button.pressed{border-color:rgba(200,255,150,0.6);background:rgba(80,140,40,0.4);box-shadow:0 0 20px rgba(150,255,100,0.25)}
+
+#touch-left{bottom:40px;left:24px}
+#touch-right{bottom:40px;left:108px}
+#touch-jump{bottom:40px;left:50%;transform:translateX(-50%)}
+#touch-attack{bottom:120px;right:24px}
+
+/* Night court theme */
+#touch-controls.night button{border-color:rgba(150,150,255,0.25);background:rgba(20,20,50,0.4);color:rgba(180,180,255,0.7)}
+#touch-controls.night button.pressed{border-color:rgba(180,180,255,0.6);background:rgba(60,60,140,0.4);box-shadow:0 0 20px rgba(150,150,255,0.3)}
+
+/* Twilight theme */
+#touch-controls.twilight button{border-color:rgba(200,150,220,0.25);background:rgba(40,20,50,0.4);color:rgba(220,180,240,0.7)}
+#touch-controls.twilight button.pressed{border-color:rgba(220,180,255,0.6);background:rgba(100,60,120,0.4);box-shadow:0 0 20px rgba(200,150,255,0.3)}
+
+/* Rotate notice overlay */
+#rotate-notice{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;color:#afa;font-size:18px;letter-spacing:2px;gap:20px}
+#rotate-notice svg{width:60px;height:60px;stroke:#afa;fill:none;stroke-width:1.5;animation:rotateHint 2s ease-in-out infinite}
+@keyframes rotateHint{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-90deg)}}
+
+/* Responsive — small phones */
+@media(max-width:480px){
+  .hud-item{padding:5px 10px;font-size:12px}
+  .hud-item .value{font-size:17px}
+  #start-screen h1{font-size:32px;letter-spacing:6px}
+  #start-screen .subtitle{font-size:14px;letter-spacing:5px}
+  .story-page p{font-size:15px}
+  #touch-controls button{width:58px;height:58px}
+  #touch-controls button svg{width:24px;height:24px}
+  #touch-left{left:16px;bottom:30px}
+  #touch-right{left:86px;bottom:30px}
+  #touch-jump{bottom:30px}
+  #touch-attack{right:16px;bottom:100px}
+}
+
+/* Landscape on mobile — show rotate notice */
+@media(orientation:landscape) and (max-height:500px) and (pointer:coarse){
+  #rotate-notice{display:flex}
+  #touch-controls button{width:52px;height:52px}
+  #touch-controls button svg{width:20px;height:20px}
+}
 </style>
 </head>
 <body>
@@ -148,10 +199,41 @@ canvas{display:block;position:relative;z-index:0}
 
 <canvas id="slash-canvas"></canvas>
 
+<div id="touch-controls">
+  <button id="touch-left" aria-label="Move left">
+    <svg viewBox="0 0 24 24"><path d="M15 4l-8 8 8 8"/><path d="M10 12c-2 3-2 6-1 8" opacity="0.3"/></svg>
+  </button>
+  <button id="touch-jump" aria-label="Jump">
+    <svg viewBox="0 0 24 24"><path d="M6 16l6-8 6 8"/><path d="M12 10c-1-1.5 0-3 1-4" opacity="0.3"/><ellipse cx="13" cy="5.5" rx="1" ry="0.7" opacity="0.25"/></svg>
+  </button>
+  <button id="touch-right" aria-label="Move right">
+    <svg viewBox="0 0 24 24"><path d="M9 4l8 8-8 8"/><path d="M14 12c2 3 2 6 1 8" opacity="0.3"/></svg>
+  </button>
+  <button id="touch-attack" aria-label="Attack">
+    <svg viewBox="0 0 24 24"><path d="M12 2l1 12-1 1-1-1z"/><path d="M9 15h6"/><path d="M11 16v4M13 16v4"/></svg>
+  </button>
+</div>
+
+<div id="rotate-notice">
+  <svg viewBox="0 0 64 64"><rect x="16" y="8" width="32" height="48" rx="4"/><circle cx="32" cy="50" r="2"/></svg>
+  <span>Rotate to portrait</span>
+</div>
+
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
 
 <script type="module">
 import * as THREE from 'three';
+
+// ── MOBILE DETECTION & STORY TEXT SWAP ───────────────────────────────────
+const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+if (isMobile) {
+  const page3 = document.querySelector('.story-page[data-page="3"] p');
+  if (page3) page3.innerHTML = 'Weave between the forest lanes with the <span>left / right buttons</span>. Leap over fallen logs and brambles, or onto ancient stones with the <span>jump button</span> or <span>swipe up</span>.';
+  const page4 = document.querySelector('.story-page[data-page="4"] p');
+  if (page4) page4.innerHTML = 'Gather ash shavings to quicken your pace. Collect iron charms to ward off fae magic. Strike down lesser fae with your ash dagger &mdash; <span>dagger button</span>.';
+  document.querySelectorAll('.story-hint').forEach(h => { h.textContent = 'Tap to continue'; });
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // AUDIO ENGINE — Procedural music via Web Audio API
@@ -885,7 +967,48 @@ document.addEventListener('keydown', e => {
   if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') doJump();
   if (e.code === 'KeyF') doAttack();
 });
-// Touch/click handlers removed for performance (keyboard-only controls)
+// ── TOUCH CONTROLS ───────────────────────────────────────────────────────
+if (isMobile) {
+  const touchControls = document.getElementById('touch-controls');
+  const btnLeft = document.getElementById('touch-left');
+  const btnRight = document.getElementById('touch-right');
+  const btnJump = document.getElementById('touch-jump');
+  const btnAttack = document.getElementById('touch-attack');
+
+  function addTouchBtn(btn, onStart, onEnd) {
+    btn.addEventListener('touchstart', e => { e.preventDefault(); btn.classList.add('pressed'); onStart(); }, { passive: false });
+    btn.addEventListener('touchend', e => { e.preventDefault(); btn.classList.remove('pressed'); if (onEnd) onEnd(); }, { passive: false });
+    btn.addEventListener('touchcancel', () => { btn.classList.remove('pressed'); });
+  }
+
+  addTouchBtn(btnLeft, () => { if (state.running) state.targetLane = Math.max(-1, state.targetLane - 1); });
+  addTouchBtn(btnRight, () => { if (state.running) state.targetLane = Math.min(1, state.targetLane + 1); });
+  addTouchBtn(btnJump, () => { if (state.running) doJump(); });
+  addTouchBtn(btnAttack, () => { if (state.running) doAttack(); });
+
+  // Swipe-up gesture for jump
+  let swipeStartY = 0, swipeStartTime = 0, swipeOnButton = false;
+  document.addEventListener('touchstart', e => {
+    const t = e.target;
+    swipeOnButton = t.closest('#touch-controls') !== null || t.closest('#start-screen') !== null || t.closest('#game-over') !== null;
+    if (!swipeOnButton) {
+      swipeStartY = e.touches[0].clientY;
+      swipeStartTime = Date.now();
+    }
+  }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (!swipeOnButton && state.running && e.changedTouches.length > 0) {
+      const dy = swipeStartY - e.changedTouches[0].clientY;
+      const dt = Date.now() - swipeStartTime;
+      if (dy > 40 && dt < 300) doJump();
+    }
+  }, { passive: true });
+
+  // Prevent scroll/zoom during gameplay
+  document.addEventListener('touchmove', e => {
+    if (state.running) e.preventDefault();
+  }, { passive: false });
+}
 
 function doJump() { if (!state.jumping || state.onPlatform) { state.jumping = true; state.jumpVel = state.jumpForce; state.onPlatform = null; } }
 function doAttack() {
@@ -969,6 +1092,14 @@ function updateCycle() {
   else if (t > 0.7) { dom.cycleIndicator.textContent = 'NIGHT COURT'; dom.cycleIndicator.style.color = '#aaf'; dom.cycleIndicator.style.borderColor = 'rgba(150,150,255,0.3)'; }
   else { dom.cycleIndicator.textContent = 'TWILIGHT'; dom.cycleIndicator.style.color = '#a8a'; dom.cycleIndicator.style.borderColor = 'rgba(170,130,170,0.2)'; }
 
+  // Sync touch-controls theme
+  if (isMobile) {
+    const tc = document.getElementById('touch-controls');
+    tc.classList.remove('night', 'twilight');
+    if (t > 0.7) tc.classList.add('night');
+    else if (t >= 0.3) tc.classList.add('twilight');
+  }
+
   audio.setCycle(t);
 }
 
@@ -1036,6 +1167,7 @@ function checkCollisions() {
 // ── GAME OVER ───────────────────────────────────────────────────────────
 function gameOver() {
   state.running = false;
+  if (isMobile) document.getElementById('touch-controls').classList.remove('visible');
   const finalScore = state.score + Math.floor(Math.abs(state.distance)) + state.ashShavings * 5 + state.ironCharms * 10;
   dom.finalScore.textContent = finalScore.toLocaleString();
   dom.finalDistance.textContent = Math.floor(Math.abs(state.distance)) + 'm';
@@ -1221,6 +1353,7 @@ function startGame() {
   slashTrails = [];
   dom.startScreen.style.display = 'none';
   dom.gameOver.style.display = 'none';
+  if (isMobile) document.getElementById('touch-controls').classList.add('visible');
   dom.speedBoost.style.opacity = '0';
   dom.invincible.style.opacity = '0';
   clock.getDelta();
