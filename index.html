@@ -7,6 +7,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0a1a0a">
 <link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
 <title>Spring Court Runner</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -17,40 +20,54 @@ canvas{display:block;position:relative;z-index:0}
 
 #hud{position:absolute;top:20px;left:20px;right:20px;display:flex;justify-content:space-between;align-items:flex-start}
 #hud-left,#hud-right{display:flex;flex-direction:column;gap:8px}
-.hud-item{background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 16px;color:#fff;font-size:14px;backdrop-filter:blur(6px)}
-.hud-item .label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#888}
-.hud-item .value{font-size:22px;font-weight:700}
+.hud-item{background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-top:1px solid rgba(200,168,74,0.2);border-radius:10px;padding:10px 18px;color:#fff;font-size:14px;backdrop-filter:blur(6px);position:relative}
+.hud-item::before{content:'╭';position:absolute;top:2px;left:6px;font-size:10px;color:rgba(200,168,74,0.3);line-height:1}
+.hud-item::after{content:'╮';position:absolute;top:2px;right:6px;font-size:10px;color:rgba(200,168,74,0.3);line-height:1}
+.hud-item .label{font-family:'Cinzel',Georgia,serif;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#9a8a6a}
+.hud-item .value{font-size:22px;font-weight:700;color:#e8e0d0;transition:transform .2s ease-out,color .2s ease-out}
+.hud-item .value.pop{transform:scale(1.2);color:#c8a84a}
 
 #beast-warning{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#ff3333;font-size:28px;font-weight:700;text-transform:uppercase;letter-spacing:4px;opacity:0;text-shadow:0 0 30px #ff0000}
 #beast-warning.active{animation:pulse .8s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:.3;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}}
 
-#cycle-indicator{position:absolute;top:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:6px 24px;color:#fff;font-size:12px;letter-spacing:3px;text-transform:uppercase;backdrop-filter:blur(6px);transition:all 1s}
+#cycle-indicator{position:absolute;top:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-top:2px solid rgba(200,168,74,0.3);border-radius:20px;padding:8px 28px;color:#fff;font-family:'Cinzel',Georgia,serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;backdrop-filter:blur(6px);transition:all 1s}
 
-#start-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(180deg,#0a1a0a 0%,#0a0a1a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;color:#fff;pointer-events:auto}
-#start-screen h1{font-size:56px;font-weight:200;letter-spacing:12px;text-transform:uppercase;margin-bottom:4px;background:linear-gradient(90deg,#6f6,#8af);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-#start-screen .subtitle{font-size:18px;color:#686;letter-spacing:8px;margin-bottom:50px;font-weight:300}
+#start-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(180deg,#0a1a0a 0%,#0a0f1a 50%,#080820 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;color:#fff;pointer-events:auto}
+.title-decoration{display:flex;align-items:center;gap:12px;color:#c8a84a;margin-bottom:12px;position:relative}
+.title-decoration::before{content:'✦';font-size:10px;opacity:0.5}
+.title-decoration::after{content:'✦';font-size:10px;opacity:0.5}
+#start-screen h1{font-family:'Cinzel',Georgia,serif;font-size:56px;font-weight:600;letter-spacing:12px;text-transform:uppercase;margin-bottom:4px;background:linear-gradient(90deg,#c8a84a,#e8d88a,#a8b0c8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:none}
+#start-screen .subtitle{font-family:'Cinzel',Georgia,serif;font-size:18px;color:#8a7a5a;letter-spacing:8px;margin-bottom:50px;font-weight:400}
 #start-screen .controls{font-size:13px;color:#555;line-height:2.2;text-align:center;margin-bottom:40px}
-#start-screen .controls span{color:#9d9;font-weight:600}
-#start-btn{pointer-events:all;cursor:pointer;background:none;border:1px solid rgba(150,255,150,0.3);color:#afa;font-size:16px;letter-spacing:6px;text-transform:uppercase;padding:16px 60px;border-radius:30px;transition:all .3s}
-#start-btn:hover{background:rgba(150,255,150,0.08);border-color:rgba(150,255,150,0.7);box-shadow:0 0 40px rgba(100,255,100,0.15)}
+#start-screen .controls span{color:#c8a84a;font-weight:600}
+#start-btn{pointer-events:all;cursor:pointer;background:none;border:1px solid rgba(200,168,74,0.3);color:#d4b45a;font-family:'Cinzel',Georgia,serif;font-size:16px;letter-spacing:6px;text-transform:uppercase;padding:16px 60px;border-radius:30px;transition:all .3s;position:relative}
+#start-btn::before{content:'❧';position:absolute;left:16px;top:50%;transform:translateY(-50%);opacity:0.4;font-size:14px}
+#start-btn::after{content:'❧';position:absolute;right:16px;top:50%;transform:translateY(-50%) scaleX(-1);opacity:0.4;font-size:14px}
+#start-btn:hover{background:rgba(200,168,74,0.08);border-color:rgba(200,168,74,0.7);box-shadow:0 0 40px rgba(200,168,74,0.15)}
 
 .story-page{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;max-width:600px;padding:0 30px;animation:fadeInPage .6s ease}
 .story-page.active{display:flex}
 @keyframes fadeInPage{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.story-page p{font-size:18px;line-height:1.9;color:#ccc;font-weight:300;letter-spacing:0.5px;margin-bottom:30px}
-.story-page p span{color:#9d9;font-weight:600;background:rgba(100,255,100,0.06);padding:2px 6px;border-radius:4px}
-.story-page .page-num{font-size:11px;color:#444;letter-spacing:4px;text-transform:uppercase;margin-bottom:20px}
-.story-next{pointer-events:all;cursor:pointer;background:none;border:1px solid rgba(150,255,150,0.2);color:#8c8;font-size:13px;letter-spacing:4px;text-transform:uppercase;padding:10px 36px;border-radius:20px;transition:all .3s;margin-top:10px}
-.story-next:hover{background:rgba(150,255,150,0.06);border-color:rgba(150,255,150,0.5)}
+.story-page p{font-size:18px;line-height:1.9;color:#d0c8b8;font-weight:300;letter-spacing:0.5px;margin-bottom:30px}
+.story-page p span{color:#c8a84a;font-weight:600;background:rgba(200,168,74,0.08);padding:2px 6px;border-radius:4px}
+.story-page .page-num{font-family:'Cinzel',Georgia,serif;font-size:11px;color:#6a5a3a;letter-spacing:4px;text-transform:uppercase;margin-bottom:20px}
+.story-page .page-num::before{content:'── '}
+.story-page .page-num::after{content:' ──'}
+.story-next{pointer-events:all;cursor:pointer;background:none;border:1px solid rgba(200,168,74,0.25);color:#c8a84a;font-family:'Cinzel',Georgia,serif;font-size:13px;letter-spacing:4px;text-transform:uppercase;padding:10px 36px;border-radius:20px;transition:all .3s;margin-top:10px}
+.story-next:hover{background:rgba(200,168,74,0.06);border-color:rgba(200,168,74,0.5)}
 .story-hint{font-size:11px;color:#3a3a3a;margin-top:16px;letter-spacing:1px}
 
-#game-over{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:100;color:#fff}
-#game-over h2{font-size:42px;font-weight:200;letter-spacing:6px;margin-bottom:30px;color:#f66}
-#game-over .final-score{font-size:64px;font-weight:700;background:linear-gradient(90deg,#f88,#fa8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-#game-over .final-distance{font-size:16px;color:#666;margin-bottom:40px}
-#restart-btn{pointer-events:all;cursor:pointer;background:none;border:1px solid rgba(255,100,100,0.3);color:#faa;font-size:16px;letter-spacing:4px;text-transform:uppercase;padding:14px 50px;border-radius:30px;transition:all .3s}
+#game-over{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(1px 1px at 20% 15%,#fff 0.5px,transparent 1px),radial-gradient(1px 1px at 60% 25%,#aaf 0.5px,transparent 1px),radial-gradient(1px 1px at 80% 10%,#fff 0.5px,transparent 1px),radial-gradient(1px 1px at 35% 35%,#88f 0.5px,transparent 1px),radial-gradient(1px 1px at 10% 30%,#fff 0.5px,transparent 1px),radial-gradient(1px 1px at 50% 8%,#ccf 0.5px,transparent 1px),radial-gradient(1px 1px at 90% 20%,#fff 0.5px,transparent 1px),radial-gradient(1px 1px at 70% 40%,#aaf 0.5px,transparent 1px),linear-gradient(180deg,#0a0a2a 0%,#0a0820 60%,#1a0a1a 100%);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:100;color:#fff;overflow:hidden}
+#game-over h2{font-family:'Cinzel',Georgia,serif;font-size:42px;font-weight:400;letter-spacing:8px;margin-bottom:30px;color:#cc4444;text-shadow:0 0 40px rgba(255,50,50,0.3)}
+#game-over .final-score{font-family:'Cinzel',Georgia,serif;font-size:64px;font-weight:700;background:linear-gradient(90deg,#cc4444,#d4a848);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#game-over .final-distance{font-family:'Cinzel',Georgia,serif;font-size:16px;color:#6a6a80;margin-bottom:40px}
+#restart-btn{pointer-events:all;cursor:pointer;background:none;border:1px solid rgba(255,100,100,0.3);color:#faa;font-family:'Cinzel',Georgia,serif;font-size:16px;letter-spacing:4px;text-transform:uppercase;padding:14px 50px;border-radius:30px;transition:all .3s;position:relative;z-index:1}
 #restart-btn:hover{background:rgba(255,100,100,0.08);border-color:rgba(255,100,100,0.7)}
+.beast-eyes{position:absolute;top:18%;left:50%;transform:translateX(-50%);display:flex;gap:28px}
+.beast-eyes span{width:8px;height:8px;border-radius:50%;background:#ff2200;box-shadow:0 0 15px #ff2200,0 0 40px rgba(255,34,0,0.4);animation:eyePulse 2s ease-in-out infinite}
+@keyframes eyePulse{0%,100%{opacity:0.6;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+.mountain-silhouette{position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(180deg,transparent,rgba(20,20,40,0.8));clip-path:polygon(0 100%,5% 60%,15% 75%,25% 40%,35% 65%,45% 30%,55% 55%,65% 35%,75% 60%,85% 45%,95% 70%,100% 100%)}
 
 #slash-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:6}
 
@@ -86,9 +103,14 @@ canvas{display:block;position:relative;z-index:0}
 @media(max-width:480px){
   .hud-item{padding:5px 10px;font-size:12px}
   .hud-item .value{font-size:17px}
-  #start-screen h1{font-size:32px;letter-spacing:6px}
-  #start-screen .subtitle{font-size:14px;letter-spacing:5px}
+  #start-screen h1{font-size:28px;letter-spacing:6px}
+  #start-screen .subtitle{font-size:12px;letter-spacing:4px}
+  .title-decoration svg{width:28px;height:28px}
   .story-page p{font-size:15px}
+  .story-page .page-num{font-size:10px}
+  #game-over h2{font-size:28px;letter-spacing:4px}
+  #game-over .final-score{font-size:48px}
+  #game-over .final-distance{font-size:14px}
   #touch-controls button{width:58px;height:58px}
   #touch-controls button svg{width:24px;height:24px}
   #touch-left{left:16px;bottom:30px}
@@ -108,6 +130,11 @@ canvas{display:block;position:relative;z-index:0}
 <body>
 
 <div id="start-screen">
+  <div class="title-decoration">
+    <svg class="crescent" viewBox="0 0 60 60" width="40" height="40">
+      <path d="M30 5a25 25 0 1 0 0 50 20 20 0 0 1 0-50z" fill="currentColor"/>
+    </svg>
+  </div>
   <h1>Spring Court</h1>
   <div class="subtitle">R U N N E R</div>
 
@@ -174,10 +201,14 @@ canvas{display:block;position:relative;z-index:0}
 </script>
 
 <div id="game-over">
+  <div class="beast-eyes">
+    <span></span><span></span>
+  </div>
   <h2>Caught by the Hunt</h2>
   <div class="final-score" id="final-score">0</div>
   <div class="final-distance" id="final-distance">0m</div>
   <button id="restart-btn">Run Again</button>
+  <div class="mountain-silhouette"></div>
 </div>
 
 <div id="ui-overlay">
@@ -530,16 +561,50 @@ scene.add(dirLight.target);
 const magicLight = new THREE.PointLight(0x44ff88, 0.8, 30);
 scene.add(magicLight);
 
+// ── PROCEDURAL TEXTURES ─────────────────────────────────────────────────
+function createGrassTexture() {
+  const c = document.createElement('canvas'); c.width = 256; c.height = 256;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#2a4a22'; ctx.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 3000; i++) {
+    const x = Math.random() * 256, y = Math.random() * 256;
+    const g = Math.random() > 0.5 ? Math.floor(40 + Math.random() * 30) : Math.floor(20 + Math.random() * 20);
+    ctx.fillStyle = `rgb(${Math.floor(30+Math.random()*20)},${g},${Math.floor(20+Math.random()*15)})`;
+    ctx.fillRect(x, y, 1 + Math.random(), 1 + Math.random());
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(20, 50);
+  return tex;
+}
+function createDirtTexture() {
+  const c = document.createElement('canvas'); c.width = 256; c.height = 256;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#4a3a1a'; ctx.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 2000; i++) {
+    const x = Math.random() * 256, y = Math.random() * 256;
+    const b = Math.random() > 0.5 ? Math.floor(50 + Math.random() * 30) : Math.floor(30 + Math.random() * 20);
+    ctx.fillStyle = `rgb(${b},${Math.floor(b*0.7)},${Math.floor(b*0.3)})`;
+    ctx.fillRect(x, y, 1 + Math.random(), 1 + Math.random());
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(4, 50);
+  return tex;
+}
+const grassTex = createGrassTexture();
+const dirtTex = createDirtTexture();
+
 // ── GROUND ──────────────────────────────────────────────────────────────
 const groundGeo = new THREE.PlaneGeometry(200, 500);
-const groundMat = new THREE.MeshStandardMaterial({ color: 0x2a4a22, roughness: 0.95 });
+const groundMat = new THREE.MeshStandardMaterial({ color: 0x2a4a22, roughness: 0.95, map: grassTex });
 const ground = new THREE.Mesh(groundGeo, groundMat);
 ground.rotation.x = -Math.PI / 2; ground.position.z = -200;
 scene.add(ground);
 
 // Path
 const pathGeo = new THREE.PlaneGeometry(8, 500);
-const pathMat = new THREE.MeshStandardMaterial({ color: 0x4a3a1a, roughness: 0.85 });
+const pathMat = new THREE.MeshStandardMaterial({ color: 0x4a3a1a, roughness: 0.85, map: dirtTex });
 const pathMesh = new THREE.Mesh(pathGeo, pathMat);
 pathMesh.rotation.x = -Math.PI / 2; pathMesh.position.y = 0.01; pathMesh.position.z = -200;
 scene.add(pathMesh);
@@ -630,15 +695,26 @@ function createMushroom(x, z) {
 
 // ── WILL-O-WISPS (night court floating lights) ──────────────────────────
 const wisps = [];
+const wispHaloMats = [
+  new THREE.MeshBasicMaterial({ color: 0x44ffaa, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending, depthWrite: false }),
+  new THREE.MeshBasicMaterial({ color: 0x88aaff, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending, depthWrite: false }),
+  new THREE.MeshBasicMaterial({ color: 0xcc88ff, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending, depthWrite: false }),
+  new THREE.MeshBasicMaterial({ color: 0x44ddcc, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending, depthWrite: false })
+];
+const wispHaloGeo = new THREE.SphereGeometry(0.25, 6, 6);
 function createWisp(x, z) {
   const colors = [0x44ffaa, 0x88aaff, 0xcc88ff, 0x44ddcc];
-  const color = colors[Math.floor(Math.random() * colors.length)];
-  const geo = new THREE.SphereGeometry(0.08, 6, 6);
-  const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.7 });
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.position.set(x, 1.5 + Math.random() * 2, z);
-  mesh.userData = { baseY: mesh.position.y, phase: Math.random() * Math.PI * 2, baseX: x, speed: 0.5 + Math.random() * 1.5 };
-  return mesh;
+  const ci = Math.floor(Math.random() * colors.length);
+  const color = colors[ci];
+  const g = new THREE.Group();
+  const core = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 6),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.7 }));
+  g.add(core);
+  const halo = new THREE.Mesh(wispHaloGeo, wispHaloMats[ci]);
+  g.add(halo);
+  g.position.set(x, 1.5 + Math.random() * 2, z);
+  g.userData = { baseY: g.position.y, phase: Math.random() * Math.PI * 2, baseX: x, speed: 0.5 + Math.random() * 1.5 };
+  return g;
 }
 
 // ── AURORA (night court sky effect) ─────────────────────────────────────
@@ -679,19 +755,19 @@ for (let i = 0; i < 8; i++) {
 
 // ── GROUND PARTICLES (dust motes) ───────────────────────────────────────
 const dustGeo = new THREE.BufferGeometry();
-const dustCount = 60;
+const dustCount = 120;
 const dustPositions = new Float32Array(dustCount * 3);
 const dustSizes = new Float32Array(dustCount);
 for (let i = 0; i < dustCount; i++) {
   dustPositions[i * 3] = (Math.random() - 0.5) * 30;
   dustPositions[i * 3 + 1] = Math.random() * 5;
   dustPositions[i * 3 + 2] = (Math.random() - 0.5) * 60;
-  dustSizes[i] = 1 + Math.random() * 2;
+  dustSizes[i] = 0.5 + Math.random() * 3;
 }
 dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPositions, 3));
 dustGeo.setAttribute('size', new THREE.BufferAttribute(dustSizes, 1));
 const dustMat = new THREE.PointsMaterial({
-  color: 0xffeedd, size: 0.05, transparent: true, opacity: 0.3,
+  color: 0xffeedd, size: 0.06, transparent: true, opacity: 0.3,
   blending: THREE.AdditiveBlending, depthWrite: false
 });
 const dustParticles = new THREE.Points(dustGeo, dustMat);
@@ -701,7 +777,7 @@ scene.add(dustParticles);
 const playerGroup = new THREE.Group();
 
 const bodyMat = new THREE.MeshStandardMaterial({ color: 0xcc8866, roughness: 0.6 });
-const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.3, 0.8, 8, 12), bodyMat);
+const body = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 1.0, 8), bodyMat);
 body.position.y = 1.0; playerGroup.add(body);
 
 const head = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 12),
@@ -712,9 +788,23 @@ const hair = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.6, 8),
   new THREE.MeshStandardMaterial({ color: 0x553322, roughness: 0.8 }));
 hair.position.set(0, 1.85, 0.1); hair.rotation.x = 0.3; playerGroup.add(hair);
 
-const cloak = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1.2, 8),
+const cloak = new THREE.Mesh(new THREE.ConeGeometry(0.55, 1.3, 12),
   new THREE.MeshStandardMaterial({ color: 0x2a3a2a, roughness: 0.85 }));
 cloak.position.set(0, 0.8, 0.15); playerGroup.add(cloak);
+
+// Arms
+const armMat = new THREE.MeshStandardMaterial({ color: 0xcc8866, roughness: 0.6 });
+const leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.55, 6), armMat);
+leftArm.position.set(-0.38, 1.15, 0); playerGroup.add(leftArm);
+const rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.55, 6), armMat);
+rightArm.position.set(0.38, 1.15, 0); playerGroup.add(rightArm);
+
+// Boots
+const bootMat = new THREE.MeshStandardMaterial({ color: 0x1a1208, roughness: 0.9 });
+const leftBoot = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.13, 0.15, 6), bootMat);
+leftBoot.position.set(-0.15, 0.05, 0); playerGroup.add(leftBoot);
+const rightBoot = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.13, 0.15, 6), bootMat);
+rightBoot.position.set(0.15, 0.05, 0); playerGroup.add(rightBoot);
 
 // Dagger
 const daggerGroup = new THREE.Group();
@@ -737,29 +827,75 @@ rightLeg.position.set(0.15, 0.3, 0); playerGroup.add(rightLeg);
 
 scene.add(playerGroup);
 
+// Blob shadow under player
+const shadowCanvas = document.createElement('canvas'); shadowCanvas.width = 32; shadowCanvas.height = 32;
+const shadowCtx = shadowCanvas.getContext('2d');
+const shadowGrad = shadowCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
+shadowGrad.addColorStop(0, 'rgba(0,0,0,0.7)'); shadowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+shadowCtx.fillStyle = shadowGrad; shadowCtx.fillRect(0, 0, 32, 32);
+const shadowTex = new THREE.CanvasTexture(shadowCanvas);
+const playerShadow = new THREE.Mesh(
+  new THREE.PlaneGeometry(1.2, 1.2),
+  new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false })
+);
+playerShadow.rotation.x = -Math.PI / 2;
+playerShadow.position.y = 0.02;
+scene.add(playerShadow);
+
+// Trail particles pool
+const trailPool = [];
+const trailGeo = new THREE.SphereGeometry(0.03, 3, 3);
+const trailMat = new THREE.MeshBasicMaterial({ color: 0xddcc99, transparent: true, opacity: 0.5 });
+for (let i = 0; i < 20; i++) {
+  const tm = new THREE.Mesh(trailGeo, trailMat.clone());
+  tm.visible = false;
+  tm.userData = { life: 0 };
+  scene.add(tm);
+  trailPool.push(tm);
+}
+let trailIdx = 0, trailTimer = 0;
+
 // ── BEAST ───────────────────────────────────────────────────────────────
 const beastGroup = new THREE.Group();
 const beastBody = new THREE.Mesh(
-  new THREE.SphereGeometry(1.2, 8, 8),
+  new THREE.IcosahedronGeometry(1.2, 1),
   new THREE.MeshStandardMaterial({ color: 0x1a0505, roughness: 0.4, emissive: 0x330000, emissiveIntensity: 0.4 })
 );
 beastBody.scale.set(1, 0.7, 1.5); beastBody.position.y = 1.2; beastGroup.add(beastBody);
-// Tendrils
-for (let i = 0; i < 6; i++) {
-  const t = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.02, 1.5, 4),
-    new THREE.MeshStandardMaterial({ color: 0x1a0505, emissive: 0x220000, emissiveIntensity: 0.3 }));
+// Tendrils (shared material)
+const beastTendrils = [];
+const tendrilMat = new THREE.MeshStandardMaterial({ color: 0x1a0505, emissive: 0x220000, emissiveIntensity: 0.3 });
+for (let i = 0; i < 8; i++) {
+  const t = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.02, 1.5, 4), tendrilMat);
   t.position.set((Math.random() - 0.5) * 1.5, 0.5, 0.5 + Math.random());
-  t.rotation.x = 0.5 + Math.random() * 0.5;
-  t.rotation.z = (Math.random() - 0.5) * 0.8;
+  const bRotX = 0.5 + Math.random() * 0.5;
+  const bRotZ = (Math.random() - 0.5) * 0.8;
+  t.rotation.x = bRotX; t.rotation.z = bRotZ;
+  t.userData = { baseRotX: bRotX, baseRotZ: bRotZ, phaseX: Math.random() * Math.PI * 2, phaseZ: Math.random() * Math.PI * 2 };
   beastGroup.add(t);
+  beastTendrils.push(t);
 }
-// Eyes
+// Eyes (slit shape)
+const beastEyes = [];
 for (let s of [-1, 1]) {
   const eye = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 8),
     new THREE.MeshBasicMaterial({ color: 0xff2200 }));
   eye.position.set(s * 0.4, 1.5, -1.2);
+  eye.scale.set(1.4, 0.7, 1.0);
   beastGroup.add(eye);
+  beastEyes.push(eye);
 }
+// Smoke aura (sprite)
+const smokeCanvas = document.createElement('canvas'); smokeCanvas.width = 64; smokeCanvas.height = 64;
+const smokeCtx = smokeCanvas.getContext('2d');
+const smokeGrad = smokeCtx.createRadialGradient(32, 32, 0, 32, 32, 32);
+smokeGrad.addColorStop(0, 'rgba(20,5,5,0.6)'); smokeGrad.addColorStop(1, 'rgba(20,5,5,0)');
+smokeCtx.fillStyle = smokeGrad; smokeCtx.fillRect(0, 0, 64, 64);
+const smokeTex = new THREE.CanvasTexture(smokeCanvas);
+const beastSmoke = new THREE.Sprite(new THREE.SpriteMaterial({ map: smokeTex, transparent: true, opacity: 0.5, depthWrite: false }));
+beastSmoke.scale.set(6, 4, 1); beastSmoke.position.set(0, 1.2, 1.5);
+beastGroup.add(beastSmoke);
+
 const beastLight = new THREE.PointLight(0xff2200, 0.5, 20);
 beastLight.position.y = 2; beastGroup.add(beastLight);
 beastGroup.position.set(0, 0, 80);
@@ -769,18 +905,30 @@ scene.add(beastGroup);
 const trees = [], obstacles = [], collectibles = [], fairies = [], particles = [];
 const envObjects = []; // flowers, mushrooms, wisps, grass
 
+const treeTrunkMat = new THREE.MeshStandardMaterial({ color: 0x3a2510, roughness: 0.95 });
+const treeCanopyMat = new THREE.MeshStandardMaterial({ color: 0x1a5a1a, roughness: 0.85 });
+
 function createTree() {
   const g = new THREE.Group();
   const h = 4 + Math.random() * 5;
-  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.3, h, 6),
-    new THREE.MeshStandardMaterial({ color: 0x3a2510, roughness: 0.95 }));
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.35, h, 6), treeTrunkMat);
   trunk.position.y = h / 2; g.add(trunk);
-  // Multiple canopy layers
+  // Branch stubs
+  const branchCount = 1 + Math.floor(Math.random() * 2);
+  for (let b = 0; b < branchCount; b++) {
+    const bLen = 0.6 + Math.random() * 0.5;
+    const branch = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.07, bLen, 4), treeTrunkMat);
+    branch.position.set(0, h * 0.4 + b * h * 0.2, 0);
+    branch.rotation.z = (Math.random() > 0.5 ? 1 : -1) * (0.6 + Math.random() * 0.6);
+    branch.rotation.y = Math.random() * Math.PI * 2;
+    g.add(branch);
+  }
+  // Canopy layers (icosahedral for organic faceted look)
   for (let j = 0; j < 2 + Math.floor(Math.random() * 2); j++) {
     const r = 1.0 + Math.random() * 1.0;
-    const canopy = new THREE.Mesh(new THREE.SphereGeometry(r, 7, 7),
-      new THREE.MeshStandardMaterial({ color: 0x1a5a1a, roughness: 0.85 }));
+    const canopy = new THREE.Mesh(new THREE.IcosahedronGeometry(r, 1), treeCanopyMat);
     canopy.position.set((Math.random() - 0.5) * 0.8, h + j * 0.8, (Math.random() - 0.5) * 0.8);
+    canopy.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
     g.add(canopy);
   }
   return g;
@@ -881,7 +1029,7 @@ function spawnParticle(pos, color, count = 1) {
       new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 1 }));
     mesh.position.copy(pos);
     mesh.userData = {
-      vel: new THREE.Vector3((Math.random() - 0.5) * 0.2, Math.random() * 0.2, (Math.random() - 0.5) * 0.15),
+      vel: new THREE.Vector3((Math.random() - 0.5) * 0.2, 0.05 + Math.random() * 0.2, (Math.random() - 0.5) * 0.15),
       life: 1
     };
     scene.add(mesh);
@@ -1077,7 +1225,8 @@ function updateCycle() {
   }
   // Wisps (brighter at night)
   for (const w of wisps) {
-    w.material.opacity = 0.3 + t * 0.7;
+    w.children[0].material.opacity = 0.3 + t * 0.7;
+    w.children[1].material.opacity = 0.1 + t * 0.2;
   }
 
   // Ground color shift
@@ -1088,9 +1237,26 @@ function updateCycle() {
   dustMat.color.lerpColors(new THREE.Color(0xffeedd), new THREE.Color(0xaaaaff), t);
   dustMat.opacity = 0.2 + t * 0.25;
 
-  if (t < 0.3) { dom.cycleIndicator.textContent = 'SPRING COURT'; dom.cycleIndicator.style.color = '#8f8'; dom.cycleIndicator.style.borderColor = 'rgba(100,255,100,0.2)'; }
-  else if (t > 0.7) { dom.cycleIndicator.textContent = 'NIGHT COURT'; dom.cycleIndicator.style.color = '#aaf'; dom.cycleIndicator.style.borderColor = 'rgba(150,150,255,0.3)'; }
-  else { dom.cycleIndicator.textContent = 'TWILIGHT'; dom.cycleIndicator.style.color = '#a8a'; dom.cycleIndicator.style.borderColor = 'rgba(170,130,170,0.2)'; }
+  const hudItems = document.querySelectorAll('.hud-item');
+  if (t < 0.3) {
+    dom.cycleIndicator.textContent = '\u2727 SPRING COURT \u2727';
+    dom.cycleIndicator.style.color = '#8f8';
+    dom.cycleIndicator.style.borderColor = 'rgba(100,255,100,0.2)';
+    dom.cycleIndicator.style.borderTopColor = 'rgba(100,200,74,0.4)';
+    hudItems.forEach(el => el.style.borderTopColor = 'rgba(150,200,74,0.25)');
+  } else if (t > 0.7) {
+    dom.cycleIndicator.textContent = '\u263E NIGHT COURT \u263E';
+    dom.cycleIndicator.style.color = '#aaf';
+    dom.cycleIndicator.style.borderColor = 'rgba(150,150,255,0.3)';
+    dom.cycleIndicator.style.borderTopColor = 'rgba(150,170,255,0.4)';
+    hudItems.forEach(el => el.style.borderTopColor = 'rgba(150,170,255,0.3)');
+  } else {
+    dom.cycleIndicator.textContent = '\u2726 TWILIGHT \u2726';
+    dom.cycleIndicator.style.color = '#a8a';
+    dom.cycleIndicator.style.borderColor = 'rgba(170,130,170,0.2)';
+    dom.cycleIndicator.style.borderTopColor = 'rgba(180,140,200,0.4)';
+    hudItems.forEach(el => el.style.borderTopColor = 'rgba(180,140,200,0.25)');
+  }
 
   // Sync touch-controls theme
   if (isMobile) {
@@ -1129,7 +1295,8 @@ function checkCollisions() {
       if (state.attacking) {
         fairy.userData.alive = false;
         state.score += 50;
-        spawnParticle(fairy.position.clone(), 0xaa66ff, 5);
+        shakeIntensity = Math.max(shakeIntensity, 0.02);
+        spawnParticle(fairy.position.clone(), 0xaa66ff, 8);
         audio.playKill();
         scene.remove(fairy);
       } else if (state.hitCooldown <= 0) { gameOver(); return; }
@@ -1143,7 +1310,8 @@ function checkCollisions() {
         state.ashShavings++;
         state.score += 10;
         state.speedBoost = Math.min(0.3, state.speedBoost + 0.015);
-        spawnParticle(col.position.clone(), 0xddaa44, 6);
+        shakeIntensity = Math.max(shakeIntensity, 0.015);
+        spawnParticle(col.position.clone(), 0xddaa44, 10);
         dom.speedBoost.style.opacity = '1';
         dom.speedBoost.textContent = `SPEED +${Math.round(state.speedBoost * 100)}%`;
         setTimeout(() => dom.speedBoost.style.opacity = '0', 1500);
@@ -1153,7 +1321,8 @@ function checkCollisions() {
         state.hitCooldown = 3;
         // Iron also slows beast
         state.beastDistance = Math.min(80, state.beastDistance + 8);
-        spawnParticle(col.position.clone(), 0x6666ff, 6);
+        shakeIntensity = Math.max(shakeIntensity, 0.02);
+        spawnParticle(col.position.clone(), 0x6666ff, 10);
         dom.invincible.style.opacity = '1';
         setTimeout(() => dom.invincible.style.opacity = '0', 3000);
       }
@@ -1177,6 +1346,8 @@ function gameOver() {
 // ── UPDATE ──────────────────────────────────────────────────────────────
 const clock = new THREE.Clock();
 let runAnim = 0;
+let shakeIntensity = 0;
+let prevScore = 0, prevAsh = 0, prevIron = 0;
 
 function update() {
   const dt = Math.min(clock.getDelta(), 0.05);
@@ -1210,10 +1381,19 @@ function update() {
   }
   playerGroup.position.y = state.playerY;
 
+  // Blob shadow
+  playerShadow.position.x = playerGroup.position.x;
+  playerShadow.position.z = playerGroup.position.z;
+  const shadowScale = Math.max(0.4, 1.0 - state.playerY * 0.3);
+  playerShadow.scale.setScalar(shadowScale);
+  playerShadow.material.opacity = shadowScale * 0.7;
+
   // Run animation
   runAnim += dt * state.speed * 25;
   leftLeg.rotation.x = Math.sin(runAnim) * 0.6;
   rightLeg.rotation.x = Math.sin(runAnim + Math.PI) * 0.6;
+  leftArm.rotation.x = Math.sin(runAnim + Math.PI) * 0.4;
+  rightArm.rotation.x = Math.sin(runAnim) * 0.4;
   body.rotation.x = Math.sin(runAnim * 2) * 0.03;
   cloak.rotation.x = 0.1 + Math.sin(runAnim) * 0.06;
   hair.rotation.x = 0.3 + Math.sin(runAnim) * 0.04;
@@ -1242,6 +1422,13 @@ function update() {
   camera.position.x += (playerGroup.position.x * 0.3 - camera.position.x) * 0.08;
   camera.position.z = state.distance + 8;
   camera.position.y = 4.5 + state.playerY * 0.3;
+  // Camera shake
+  shakeIntensity *= 0.92;
+  if (state.beastClosing) shakeIntensity = Math.max(shakeIntensity, 0.03 * (1 - state.beastDistance / 25));
+  if (shakeIntensity > 0.001) {
+    camera.position.x += (Math.random() - 0.5) * shakeIntensity * 2;
+    camera.position.y += (Math.random() - 0.5) * shakeIntensity * 2;
+  }
   camera.lookAt(playerGroup.position.x * 0.5, 1.5, state.distance - 10);
 
   // Move ground
@@ -1271,7 +1458,16 @@ function update() {
   }
   beastGroup.position.z = state.distance + state.beastDistance;
   beastGroup.position.x += (playerGroup.position.x - beastGroup.position.x) * 0.015;
-  beastBody.rotation.y = Math.sin(Date.now() * 0.003) * 0.2;
+  const bTime = Date.now() * 0.001;
+  beastBody.rotation.y = Math.sin(bTime * 3) * 0.2;
+  beastBody.scale.y = 0.7 + Math.sin(bTime * 1.5) * 0.05;
+  for (const t of beastTendrils) {
+    t.rotation.x = t.userData.baseRotX + Math.sin(bTime + t.userData.phaseX) * 0.4;
+    t.rotation.z = t.userData.baseRotZ + Math.sin(bTime * 0.8 + t.userData.phaseZ) * 0.3;
+  }
+  const eyeScale = 1.0 + (state.beastClosing ? Math.sin(bTime * 4) * 0.15 : 0);
+  for (const e of beastEyes) { e.scale.y = 0.7 * eyeScale; }
+  beastSmoke.material.opacity = 0.4 + Math.sin(bTime) * 0.2;
   beastLight.intensity = 0.5 + (state.beastClosing ? Math.sin(Date.now() * 0.01) * 0.8 : 0);
   audio.setHuntIntensity(state.beastClosing ? Math.max(0, 1 - state.beastDistance / 25) : 0);
 
@@ -1315,6 +1511,27 @@ function update() {
     if (p.userData.life <= 0) { scene.remove(p); particles.splice(i, 1); }
   }
 
+  // Trail particles
+  trailTimer += dt;
+  if (state.speed > 0.4 && trailTimer >= 0.06) {
+    trailTimer = 0;
+    const tp = trailPool[trailIdx];
+    tp.position.set(playerGroup.position.x + (Math.random() - 0.5) * 0.3, 0.05, playerGroup.position.z + 0.5);
+    tp.userData.life = 1;
+    tp.visible = true;
+    tp.material.opacity = 0.5;
+    tp.scale.setScalar(1);
+    trailIdx = (trailIdx + 1) % trailPool.length;
+  }
+  for (const tp of trailPool) {
+    if (tp.userData.life > 0) {
+      tp.userData.life -= dt * 3;
+      tp.material.opacity = tp.userData.life * 0.5;
+      tp.scale.setScalar(tp.userData.life);
+      if (tp.userData.life <= 0) tp.visible = false;
+    }
+  }
+
   updateCycle();
   spawnObjects();
   cleanup();
@@ -1325,6 +1542,22 @@ function update() {
   dom.distVal.textContent = Math.floor(Math.abs(state.distance)) + 'm';
   dom.ashVal.textContent = state.ashShavings;
   dom.ironVal.textContent = state.ironCharms;
+  // HUD pop animation
+  if (state.ashShavings !== prevAsh) {
+    prevAsh = state.ashShavings;
+    dom.ashVal.classList.add('pop');
+    setTimeout(() => dom.ashVal.classList.remove('pop'), 200);
+  }
+  if (state.ironCharms !== prevIron) {
+    prevIron = state.ironCharms;
+    dom.ironVal.classList.add('pop');
+    setTimeout(() => dom.ironVal.classList.remove('pop'), 200);
+  }
+  if (state.score - prevScore >= 20) {
+    prevScore = state.score;
+    dom.scoreVal.classList.add('pop');
+    setTimeout(() => dom.scoreVal.classList.remove('pop'), 200);
+  }
 }
 
 // ── RENDER LOOP ─────────────────────────────────────────────────────────
@@ -1351,6 +1584,10 @@ function startGame() {
     while (arr.length) scene.remove(arr.pop());
   }
   slashTrails = [];
+  shakeIntensity = 0;
+  prevScore = 0; prevAsh = 0; prevIron = 0;
+  trailIdx = 0; trailTimer = 0;
+  for (const tp of trailPool) { tp.visible = false; tp.userData.life = 0; }
   dom.startScreen.style.display = 'none';
   dom.gameOver.style.display = 'none';
   if (isMobile) document.getElementById('touch-controls').classList.add('visible');
