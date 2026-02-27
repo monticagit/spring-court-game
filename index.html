@@ -31,6 +31,16 @@ canvas{display:block}
 #start-btn{pointer-events:all;cursor:pointer;background:none;border:1px solid rgba(150,255,150,0.3);color:#afa;font-size:16px;letter-spacing:6px;text-transform:uppercase;padding:16px 60px;border-radius:30px;transition:all .3s}
 #start-btn:hover{background:rgba(150,255,150,0.08);border-color:rgba(150,255,150,0.7);box-shadow:0 0 40px rgba(100,255,100,0.15)}
 
+.story-page{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;max-width:600px;padding:0 30px;animation:fadeInPage .6s ease}
+.story-page.active{display:flex}
+@keyframes fadeInPage{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.story-page p{font-size:18px;line-height:1.9;color:#ccc;font-weight:300;letter-spacing:0.5px;margin-bottom:30px}
+.story-page p span{color:#9d9;font-weight:600;background:rgba(100,255,100,0.06);padding:2px 6px;border-radius:4px}
+.story-page .page-num{font-size:11px;color:#444;letter-spacing:4px;text-transform:uppercase;margin-bottom:20px}
+.story-next{pointer-events:all;cursor:pointer;background:none;border:1px solid rgba(150,255,150,0.2);color:#8c8;font-size:13px;letter-spacing:4px;text-transform:uppercase;padding:10px 36px;border-radius:20px;transition:all .3s;margin-top:10px}
+.story-next:hover{background:rgba(150,255,150,0.06);border-color:rgba(150,255,150,0.5)}
+.story-hint{font-size:11px;color:#3a3a3a;margin-top:16px;letter-spacing:1px}
+
 #game-over{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:100;color:#fff}
 #game-over h2{font-size:42px;font-weight:200;letter-spacing:6px;margin-bottom:30px;color:#f66}
 #game-over .final-score{font-size:64px;font-weight:700;background:linear-gradient(90deg,#f88,#fa8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
@@ -49,12 +59,40 @@ canvas{display:block}
 <div id="start-screen">
   <h1>Spring Court</h1>
   <div class="subtitle">R U N N E R</div>
-  <div class="controls">
-    <span>A / D</span> or <span>Arrow Keys</span> — Switch Lanes<br>
-    <span>W / Space</span> — Jump<br>
-    <span>F</span> — Ash Dagger Slash
+
+  <div class="story-page active" data-page="1">
+    <div class="page-num">I</div>
+    <p>You are a mortal, lost in the Spring Court of Prythian. The ancient forest stretches endlessly &mdash; beautiful and deadly.</p>
+    <button class="story-next" onclick="advanceStory()">Continue</button>
+    <div class="story-hint">Press Space or Enter</div>
   </div>
-  <button id="start-btn">Enter the Forest</button>
+
+  <div class="story-page" data-page="2">
+    <div class="page-num">II</div>
+    <p>The Wild Hunt has found your scent. A shadow beast, born of old magic, pursues all who trespass. You must run.</p>
+    <button class="story-next" onclick="advanceStory()">Continue</button>
+    <div class="story-hint">Press Space or Enter</div>
+  </div>
+
+  <div class="story-page" data-page="3">
+    <div class="page-num">III</div>
+    <p>Weave between the forest lanes with <span>A / D</span> or <span>Arrow Keys</span>. Leap over fallen logs and brambles, or onto ancient stones with <span>W / Space</span>.</p>
+    <button class="story-next" onclick="advanceStory()">Continue</button>
+    <div class="story-hint">Press Space or Enter</div>
+  </div>
+
+  <div class="story-page" data-page="4">
+    <div class="page-num">IV</div>
+    <p>Gather ash shavings to quicken your pace. Collect iron charms to ward off fae magic. Strike down lesser fae with your ash dagger &mdash; <span>F</span>.</p>
+    <button class="story-next" onclick="advanceStory()">Continue</button>
+    <div class="story-hint">Press Space or Enter</div>
+  </div>
+
+  <div class="story-page" data-page="5">
+    <div class="page-num">V</div>
+    <p>The world shifts between Spring Court and Night Court. The beast grows faster in darkness. How far can you run?</p>
+    <button id="start-btn">Enter the Forest</button>
+  </div>
 </div>
 
 <div id="game-over">
@@ -333,6 +371,7 @@ const state = {
   beastDistance: 80, beastClosing: false,
   attacking: false, attackTimer: 0,
   hitCooldown: 0,
+  onPlatform: null,
 };
 
 // ── CACHED DOM REFS ──────────────────────────────────────────────────────
@@ -667,6 +706,19 @@ function createObstacle(type) {
       g.add(moss);
     }
     g.userData = { type: 'log', hitbox: { w: 2.5, h: 0.8 } };
+  } else if (type === 'rock') {
+    const rockMat = new THREE.MeshStandardMaterial({ color: 0x6a6a60, roughness: 0.85 });
+    const rock = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.7, 0.5, 8), rockMat);
+    rock.position.y = 0.25; g.add(rock);
+    // Moss accents on top
+    const mossMat = new THREE.MeshStandardMaterial({ color: 0x3a7a2a, roughness: 0.9 });
+    for (let i = 0; i < 3; i++) {
+      const moss = new THREE.Mesh(new THREE.SphereGeometry(0.08 + Math.random() * 0.06, 5, 5), mossMat);
+      const a = Math.random() * Math.PI * 2;
+      moss.position.set(Math.cos(a) * 0.3, 0.5, Math.sin(a) * 0.3);
+      g.add(moss);
+    }
+    g.userData = { type: 'rock', hitbox: { w: 1.2, h: 0.5 }, jumpable: true };
   }
   return g;
 }
@@ -735,7 +787,8 @@ function spawnObjects() {
   const farZ = playerGroup.position.z - 100;
 
   while (nextObsZ > farZ) {
-    const obs = createObstacle(Math.random() > 0.5 ? 'bramble' : 'log');
+    const r = Math.random();
+    const obs = createObstacle(r < 0.2 ? 'rock' : r < 0.6 ? 'bramble' : 'log');
     obs.position.set(Math.floor(Math.random() * 3 - 1) * state.laneWidth, 0, nextObsZ);
     scene.add(obs); obstacles.push(obs);
     nextObsZ -= 12 + Math.random() * 15;
@@ -807,7 +860,7 @@ document.addEventListener('keydown', e => {
 });
 // Touch/click handlers removed for performance (keyboard-only controls)
 
-function doJump() { if (!state.jumping) { state.jumping = true; state.jumpVel = state.jumpForce; } }
+function doJump() { if (!state.jumping || state.onPlatform) { state.jumping = true; state.jumpVel = state.jumpForce; state.onPlatform = null; } }
 function doAttack() {
   if (!state.attacking) {
     state.attacking = true; state.attackTimer = 0.3;
@@ -896,8 +949,17 @@ function checkCollisions() {
 
   for (const obs of obstacles) {
     const dz = Math.abs(obs.position.z - pz), dx = Math.abs(obs.position.x - px);
-    if (dz < 1.0 && dx < obs.userData.hitbox.w / 2 + 0.3 && py < obs.userData.hitbox.h) {
-      if (state.hitCooldown <= 0) { gameOver(); return; }
+    if (dz < 1.0 && dx < obs.userData.hitbox.w / 2 + 0.3) {
+      if (obs.userData.jumpable && py >= obs.userData.hitbox.h - 0.1 && state.jumpVel <= 0) {
+        // Land on top of rock
+        state.playerY = obs.userData.hitbox.h;
+        state.jumping = false;
+        state.jumpVel = 0;
+        state.onPlatform = obs;
+        state.score += 15;
+      } else if (py < obs.userData.hitbox.h) {
+        if (state.hitCooldown <= 0) { gameOver(); return; }
+      }
     }
   }
   for (const fairy of fairies) {
@@ -976,6 +1038,14 @@ function update() {
     state.jumpVel -= state.gravity;
     state.playerY += state.jumpVel;
     if (state.playerY <= 0) { state.playerY = 0; state.jumping = false; }
+  }
+  // Platform tracking — fall off rock once player passes it
+  if (state.onPlatform) {
+    if (state.onPlatform.position.z > playerGroup.position.z + 1.0) {
+      state.onPlatform = null;
+      state.jumping = true;
+      state.jumpVel = 0;
+    }
   }
   playerGroup.position.y = state.playerY;
 
@@ -1111,7 +1181,7 @@ function startGame() {
     running: true, speed: state.baseSpeed, distance: 0, score: 0,
     ashShavings: 0, ironCharms: 0, speedBoost: 0,
     lane: 0, targetLane: 0, jumping: false, jumpVel: 0, playerY: 0,
-    beastDistance: 80, beastClosing: false, attacking: false, hitCooldown: 0, cyclePhase: 0,
+    beastDistance: 80, beastClosing: false, attacking: false, hitCooldown: 0, cyclePhase: 0, onPlatform: null,
   });
   playerGroup.position.set(0, 0, 0);
   beastGroup.position.set(0, 0, 80);
@@ -1126,6 +1196,31 @@ function startGame() {
   dom.invincible.style.opacity = '0';
   clock.getDelta();
 }
+
+// ── STORY PAGES ──────────────────────────────────────────────────────
+let storyPage = 1;
+const storyPages = document.querySelectorAll('.story-page');
+const totalStoryPages = storyPages.length;
+
+window.advanceStory = function() {
+  if (storyPage >= totalStoryPages) return;
+  storyPages[storyPage - 1].classList.remove('active');
+  storyPage++;
+  storyPages[storyPage - 1].classList.add('active');
+};
+
+document.addEventListener('keydown', e => {
+  if (dom.startScreen.style.display === 'none' || state.running) return;
+  if (dom.gameOver.style.display === 'flex') return;
+  if (e.code === 'Space' || e.code === 'Enter') {
+    e.preventDefault();
+    if (storyPage < totalStoryPages) {
+      advanceStory();
+    } else {
+      startGame();
+    }
+  }
+});
 
 document.getElementById('start-btn').addEventListener('click', startGame);
 document.getElementById('restart-btn').addEventListener('click', startGame);
